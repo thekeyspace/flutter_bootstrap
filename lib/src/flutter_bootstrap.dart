@@ -29,7 +29,6 @@ class BootstrapGridBreakpoints {
   });
 }
 
-
 ///
 /// Customization of the grid
 ///
@@ -225,6 +224,13 @@ class BootstrapRow extends StatelessWidget {
   ///
   final List<BootstrapCol> children;
 
+  double _getMaxWidth(BoxConstraints constraints, double Function() fallback) {
+    if (constraints.maxWidth != double.infinity) {
+      return constraints.maxWidth;
+    }
+    return fallback();
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -232,13 +238,16 @@ class BootstrapRow extends StatelessWidget {
         //
         // Get the prefix for the definition, based on the available width
         //
-        String pfx = bootstrapPrefixBasedOnWidth(constraints.maxWidth);
+        String pfx = bootstrapPrefixBasedOnWidth(
+          _getMaxWidth(constraints, () => MediaQuery.of(context).size.width),
+        );
 
         //
         // We need to iterate through all the children and consider any potential order
         //
         List<BootstrapCol> _children = List.from(children);
-        _children.sort((a, b) => (a.orderPerSize[pfx] ?? 0) - (b.orderPerSize[pfx] ?? 0));
+        _children.sort(
+            (a, b) => (a.orderPerSize[pfx] ?? 0) - (b.orderPerSize[pfx] ?? 0));
 
         return Container(
           constraints: BoxConstraints(
@@ -403,7 +412,13 @@ class BootstrapCol extends StatelessWidget {
       //
       // Identification of the defined "dimensions"
       //
-      List<String> parts = referenceArgument.isEmpty ? [] : referenceArgument.toLowerCase().split(' ').where((t) => t.trim().isNotEmpty).toList();
+      List<String> parts = referenceArgument.isEmpty
+          ? []
+          : referenceArgument
+              .toLowerCase()
+              .split(' ')
+              .where((t) => t.trim().isNotEmpty)
+              .toList();
       parts.forEach((String part) {
         _prefixes.forEach((pfx) {
           final String prefix = '$argPrefix-$pfx${pfx == "" ? "" : "-"}';
@@ -501,7 +516,13 @@ class BootstrapCol extends StatelessWidget {
     //
     // Finally, invisibility
     //
-    List<String> parts = (invisibleForSizes ?? "").trim().isEmpty ? [] : invisibleForSizes!.toLowerCase().split(' ').where((t) => t.trim().isNotEmpty).toList();
+    List<String> parts = (invisibleForSizes ?? "").trim().isEmpty
+        ? []
+        : invisibleForSizes!
+            .toLowerCase()
+            .split(' ')
+            .where((t) => t.trim().isNotEmpty)
+            .toList();
     parts.forEach((String pfx) {
       if (['xl', 'lg', 'md', 'sm', 'xs'].contains(pfx)) {
         hiddenPerSize[pfx == 'xs' ? '' : pfx] = true;
@@ -532,7 +553,9 @@ class BootstrapCol extends StatelessWidget {
         //
         // Get the prefix for the definition, based on the available width
         //
-        String pfx = bootstrapPrefixBasedOnWidth(absoluteSizes ? MediaQuery.of(context).size.width : constraints.maxWidth);
+        String pfx = bootstrapPrefixBasedOnWidth(absoluteSizes
+            ? MediaQuery.of(context).size.width
+            : constraints.maxWidth);
 
         //
         // Check if invisible
@@ -557,13 +580,16 @@ class BootstrapCol extends StatelessWidget {
         Widget widget = Container(
           width: flexRatio * constraints.maxWidth * _oneColumnRatio,
           child: Padding(
-            padding: _gutterSize == 0.0 ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _gutterSize / 2),
+            padding: _gutterSize == 0.0
+                ? EdgeInsets.zero
+                : EdgeInsets.symmetric(horizontal: _gutterSize / 2),
             child: child,
           ),
         );
 
         if (leftMarginRatio > 0) {
-          final double leftMargin = constraints.maxWidth * leftMarginRatio * _oneColumnRatio;
+          final double leftMargin =
+              constraints.maxWidth * leftMarginRatio * _oneColumnRatio;
           widget = Padding(
             padding: EdgeInsets.only(left: leftMargin),
             child: widget,
@@ -622,7 +648,13 @@ class BootstrapVisibility extends StatelessWidget {
     //
     // Parsing of the rules
     //
-    List<String> parts = sizes.isEmpty ? [] : sizes.toLowerCase().split(' ').where((t) => t.trim().isNotEmpty).toList();
+    List<String> parts = sizes.isEmpty
+        ? []
+        : sizes
+            .toLowerCase()
+            .split(' ')
+            .where((t) => t.trim().isNotEmpty)
+            .toList();
     parts.forEach((String part) {
       _prefixes.forEach((pfx) {
         final String prefix = 'col-$pfx';
